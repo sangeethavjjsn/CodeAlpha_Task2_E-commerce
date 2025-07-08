@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Order - ShopEase</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header>
+        <h1>ShopEase</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="addorder.html">Add Order</a>
+            <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+            <a href="login.html" id="login-link">Login</a>
+            <a href="signup.html" id="signup-link">Signup</a>
+            <button id="logout-btn" style="display:none;">Logout</button>
+        </nav>
+    </header>
+
+    <div class="form-container">
+        <h2>Submit New Order</h2>
+        <form id="order-form">
+            <input type="text" id="customerName" placeholder="Customer Name" required />
+            <input type="text" id="productName" placeholder="Product Name" required />
+            <input type="number" id="quantity" placeholder="Quantity" required min="1" />
+            <input type="number" id="price" placeholder="Price (₹)" required step="0.01" />
+            <button type="submit">Place Order</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>© 2025 ShopEase</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Show/hide nav based on login status
+            const isLoggedIn = localStorage.getItem("loggedIn");
+            if (isLoggedIn) {
+                document.getElementById("login-link").style.display = "none";
+                document.getElementById("signup-link").style.display = "none";
+                document.getElementById("logout-btn").style.display = "inline-block";
+            } else {
+                alert("You must log in to place an order");
+                window.location.href = "login.html";
+            }
+
+            document.getElementById("logout-btn").addEventListener("click", () => {
+                localStorage.removeItem("loggedIn");
+                window.location.href = "login.html";
+            });
+
+            // Submit order
+            document.getElementById("order-form").addEventListener("submit", function(e) {
+                e.preventDefault();
+
+                const order = {
+                    customerName: document.getElementById("customerName").value,
+                    productName: document.getElementById("productName").value,
+                    quantity: parseInt(document.getElementById("quantity").value),
+                    price: parseFloat(document.getElementById("price").value),
+                    orderDate: new Date().toISOString().split("T")[0]
+                };
+
+                fetch("http://localhost:8081/api/orders", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(order)
+                    })
+                    .then(res => {
+                        if (res.ok) {
+                            alert("Order placed successfully!");
+                            document.getElementById("order-form").reset();
+                        } else {
+                            alert("Failed to place order. Try again.");
+                        }
+                    })
+                    .catch(() => {
+                        alert("Server error. Check your backend.");
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>

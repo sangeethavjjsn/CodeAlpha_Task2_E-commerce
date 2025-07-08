@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout - ShopEase</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .checkout-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .checkout-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .checkout-container .summary {
+            margin-bottom: 20px;
+        }
+        
+        .checkout-container ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .checkout-container li {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .checkout-container label {
+            font-weight: 600;
+            display: block;
+            margin: 10px 0 5px;
+        }
+        
+        .checkout-container input,
+        .checkout-container select,
+        .checkout-container button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        
+        .checkout-container button {
+            background-color: #2e86de;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .checkout-container button:hover {
+            background-color: #145ea8;
+        }
+        
+        .success-message {
+            text-align: center;
+            font-weight: bold;
+            color: green;
+            margin-top: 20px;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>ShopEase - Checkout</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="cart.html">Cart</a>
+        </nav>
+    </header>
+
+    <div class="checkout-container" id="checkoutContainer">
+        <h2>Order Summary</h2>
+
+        <div id="summarySection" class="summary"></div>
+
+        <form id="checkoutForm">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" required />
+
+            <label for="address">Shipping Address</label>
+            <input type="text" id="address" required />
+
+            <label for="payment">Payment Method</label>
+            <select id="payment" required>
+        <option value="cod">Cash on Delivery</option>
+        <option value="card">Credit/Debit Card</option>
+        <option value="upi">UPI</option>
+      </select>
+
+            <button type="submit">Place Order</button>
+        </form>
+
+        <p id="successMessage" class="success-message"></p>
+    </div>
+
+    <script>
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const summarySection = document.getElementById("summarySection");
+        const successMessage = document.getElementById("successMessage");
+
+        function renderSummary() {
+            if (cart.length === 0) {
+                summarySection.innerHTML = `<p class="empty-cart">Your cart is empty.</p>`;
+                document.getElementById("checkoutForm").style.display = "none";
+                return;
+            }
+
+            let total = 0;
+            const ul = document.createElement("ul");
+
+            cart.forEach(item => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+          <strong>${item.name}</strong><br/>
+          ₹${item.price} × ${item.quantity} = ₹${item.price * item.quantity}
+        `;
+                total += item.price * item.quantity;
+                ul.appendChild(li);
+            });
+
+            const totalLi = document.createElement("li");
+            totalLi.innerHTML = `<strong>Total: ₹${total}</strong>`;
+            ul.appendChild(totalLi);
+
+            summarySection.appendChild(ul);
+        }
+
+        document.getElementById("checkoutForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const payment = document.getElementById("payment").value;
+
+            if (!name || !address || !payment) {
+                alert("Please fill out all fields.");
+                return;
+            }
+
+            // Simulate placing order (you can send this to your backend too)
+            successMessage.textContent = "✅ Order placed successfully!";
+            localStorage.removeItem("cart");
+
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 2000);
+        });
+
+        renderSummary();
+    </script>
+</body>
+
+</html>

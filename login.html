@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - ShopEase</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header>
+        <h1>ShopEase</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="add-order.html">Add Order</a>
+            <a href="login.html" id="login-link">Login</a>
+            <a href="signup.html" id="signup-link">Signup</a>
+            <button id="logout-btn" style="display:none;">Logout</button>
+        </nav>
+    </header>
+
+    <div class="form-container">
+        <h2>Login to ShopEase</h2>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="Email" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+    </div>
+
+    <script>
+        // If already logged in, redirect to homepage
+        if (localStorage.getItem("loggedIn")) {
+            window.location.href = "index.html";
+        }
+
+        document.getElementById("login-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            if (!email || !password) {
+                alert("Please enter both email and password.");
+                return;
+            }
+
+            fetch("http://localhost:8081/api/users/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password
+                    })
+                })
+                .then(res => {
+                    if (res.ok) return res.text();
+                    throw new Error("Invalid login");
+                })
+                .then(data => {
+                    if (data === "Login successful") {
+                        localStorage.setItem("loggedIn", "true");
+                        alert("Login successful!");
+                        window.location.href = "index.html";
+                    } else {
+                        alert("Login failed: " + data);
+                    }
+                })
+                .catch(err => {
+                    alert("Login error: " + err.message);
+                });
+        });
+
+        // Logout button (shouldn’t show on this page unless user somehow is logged in)
+        document.addEventListener("DOMContentLoaded", () => {
+            const isLoggedIn = localStorage.getItem("loggedIn");
+            if (isLoggedIn) {
+                document.getElementById("login-link").style.display = "none";
+                document.getElementById("signup-link").style.display = "none";
+                document.getElementById("logout-btn").style.display = "inline-block";
+            }
+
+            document.getElementById("logout-btn").addEventListener("click", () => {
+                localStorage.removeItem("loggedIn");
+                window.location.href = "login.html";
+            });
+        });
+    </script>
+</body>
+
+</html>

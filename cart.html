@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart - ShopEase</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header>
+        <h1>ShopEase - Cart</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+            <a href="addorder.html">Add Order</a>
+        </nav>
+    </header>
+
+    <section class="products">
+        <h2>Your Cart</h2>
+        <div id="cart-items" class="product-grid"></div>
+        <p><strong>Total: ₹<span id="total-price">0</span></strong></p>
+        <button id="checkout-btn">Proceed to Checkout</button>
+    </section>
+
+    <footer>
+        <p>© 2025 ShopEase</p>
+    </footer>
+
+    <script>
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const cartItemsContainer = document.getElementById("cart-items");
+        const totalDisplay = document.getElementById("total-price");
+        const cartCount = document.getElementById("cart-count");
+
+        function updateCartCount() {
+            const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+            cartCount.textContent = count;
+        }
+
+        function renderCart() {
+            let total = 0;
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+                document.getElementById("checkout-btn").style.display = "none";
+                totalDisplay.textContent = "0";
+                return;
+            }
+
+            cartItemsContainer.innerHTML = "";
+            cart.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "product-card";
+                div.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" />
+          <p>${item.name}</p>
+          <p><strong>₹${item.price}</strong></p>
+          <p>Quantity: ${item.quantity}</p>
+        `;
+                cartItemsContainer.appendChild(div);
+                total += item.price * item.quantity;
+            });
+
+            totalDisplay.textContent = total;
+        }
+
+        document.getElementById("checkout-btn").addEventListener("click", () => {
+            window.location.href = "checkout.html";
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderCart();
+            updateCartCount();
+        });
+    </script>
+</body>
+
+</html>
